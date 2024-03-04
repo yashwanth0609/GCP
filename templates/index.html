@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>College Enquiry Chatbot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to bottom right, #a9cce3, #d5e1f2); /* Adjust colors as needed */
+            color: #333; /* Set text color to a darker shade for better readability */
+            
+        }
+        
+        #chatbot-container {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        #user-input-container {
+            padding: 10px;
+            background-color: #f1f1f1;
+            margin-top: 10px;
+        }
+        
+        #chat-window {
+            padding: 10px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column
+            scroll-behavior: smooth;
+        }
+        
+        #user-input {
+            width: 80%;
+            padding: 5px;
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        
+        #send-button {
+            
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            margin-left: 5px;
+        }
+
+        #chat-form {
+            
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background-color: #f1f1f1;
+        }
+        
+        .user_input{
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            bottom: 0;
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 600px;
+            background-color: #f2f2f2; /* Light gray background color for the chat container */
+            border-radius: 10px; /* Rounded corners */
+            padding: 10px; /* Padding inside the chat container */
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2); /* Box shadow for a subtle effect */
+        }
+
+        .chatinput{
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            bottom: 0;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 600px;
+            background-color: #f2f2f2; /* Light gray background color for the chat container */
+            border-radius: 10px; /* Rounded corners */
+            padding: 10px; /* Padding inside the chat container */
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2); /* Box shadow for a subtle effect */
+        }
+
+
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .user {
+            background-color: #DCF8C6;
+            text-align: right
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        
+        .bot {
+            background-color: hsl(0, 0%, 90%);
+            align-self: flex-start;
+            margin-right: auto;
+        }
+
+        #chat-messages {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px
+            padding: 10px
+        }
+    </style>   
+</head>
+<body>
+    <div id="chatbot-container">
+        <h1>Welcome to Yashwanth's College Enquiry Chatbot</h1>
+        <div id="user-info" style="display: none;">
+            <h2> <span id="user-name-display"></span></h2>
+        </div>
+        <h3> Hi, I am Yashwanth, I am your chat Assistant. How may I help you today ! </h3>
+        <div id="chat-window">
+            <div id="chat-messages"></div>
+        </div>    
+        <div id = "user-input-container">        
+            <div id="chat-form" action="/chat" method="POST">
+                <input type="text" id="user-input" name="user_input" placeholder="Type your message...">
+                <button type="submit" id="send-button"><i class="fas fa-paper-plane"></i></button>
+            </div>             
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatForm = document.getElementById('chat-form');
+            const userInput = document.getElementById('user-input');
+            const chatMessages = document.getElementById('chat-messages');
+            const userInfo = document.getElementById('user-info');
+        
+            let userFirstName = '';
+            let userLastName = '';
+            let userEmail = '';
+            let creatorFirstName = 'Yashwanth Reddy';
+            let creatorLastName = 'Dontham';
+            let creatorEmailId = 'donthayy@mail.uc.edu';
+            let start = false;
+        
+        
+            displayMessage('bot', 'Welcome to the College Enquiry Chatbot!');
+            displayMessage('bot', `<strong>Instructions:</strong><br>
+                "start" keyword will start the converstation from the begining<br>
+                So, type "start" only to start a new conversation, not in the middle of any conversation`);
+            
+            displayMessage('bot', '<strong>Type "start" to start your chat</strong>');
+
+            document.getElementById('send-button').addEventListener('click', function(event) {
+                event.preventDefault();
+                sendMessage();
+            });
+
+            userInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    sendMessage();
+                }
+            });
+        
+            function sendMessage() {
+                const message = userInput.value.trim();
+
+                if(message.toLowerCase() !== "start" &&!start){
+                    displayMessage('bot', 'Please type "start" to proceed');
+                    userInput.value = '';
+                    return;
+                }
+
+
+                if (message !== '' ) {
+                    displayMessage('user', message);
+                    userInput.value = '';
+
+                    if(message.toLowerCase() === 'start'){
+
+                        start = true;
+                        displayMessage('bot', 'Please provide your information.');
+                        displayMessage('bot', 'What is your first name?');
+                        return;
+                    }
+                    else if(message.toLowerCase() === "questions"){
+                        let questions = `1. Does the College have Co-op Program? <br>
+                    2. Does it award scholarships to the students<br>
+                    3. What is the in-state tuition fee?<br>
+                    4. Does it have cricket team?
+                    `
+
+                    displayMessage('bot', questions);
+                    return;
+                    }
+                    else if (message.toLowerCase() === 'exit') {
+                        displayExitMessage();
+                    } else if (!userFirstName) {
+                        userFirstName = message;
+                        displayMessage('bot', 'What is your last name?');
+                    } else if (!userLastName) {
+                        userLastName = message;
+                        displayUserInfo();
+                        displayMessage('bot', 'What is your email address?');
+                    } else if (!userEmail) {
+                        userEmail = message;
+                        displayMessage('bot', 'Thank you for providing your information.');
+                        displayMessage('bot', 'Here are the questions I can answer<strong>(Enter the Serial No of the Question you would like to know about):<strong>');
+                        displayMessage('bot', `<strong>Type exit, if you want to leave the chat !`);
+                        displayMessage('bot', '<strong>Type "Questions" to know the questions I could answer later anytime in the conversation?');
+                        displayMessage('bot', '1. Does the College have Co-op Program?');
+                        displayMessage('bot', '2. Does it award scholarships to the students');
+                        displayMessage('bot', '3. What is the in-state tuition fee?');
+                        displayMessage('bot', '4. Does it have cricket team?');
+                        
+                    } else {
+
+                        fetch('/chat', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: new URLSearchParams({ user_input: message })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            displayMessage('bot', data.response);
+                        });
+                    }
+                }
+            }
+
+            function displayMessage(sender, message) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', sender);
+                messageElement.innerHTML = message.replace(/\n/g, '<br>');
+                chatMessages.appendChild(messageElement);
+                messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+
+            function displayFinalInfo(sender, message) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', sender);
+                messageElement.textContent = message;
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        
+            function displayUserInfo() {
+                document.getElementById('user-name-display').textContent = "Welcome, " + userFirstName + " " + userLastName;
+                userInfo.style.display = 'block';
+            }
+
+            function displayExitMessage() {
+                userInfo.style.display = 'none'
+                
+                const exitMessage = `
+                    <strong>User Details:</strong><br>
+                    First Name: ${userFirstName}<br>
+                    Last Name: ${userLastName}<br>
+                    Email: ${userEmail}<br><br>
+                    <strong>Chatbot Creator Details:</strong><br>
+                    First Name: Yashwanth Reddy<br>
+                    Last Name: Dontham<br>
+                    Email: donthayy@mail.uc.edu<br><br>
+                    <strong>Thanks for Chatting with me, Have a nice day!</strong><br><br>
+                    <strong>Type "start" to restart the session</strong>    
+                `;
+                displayMessage('bot', exitMessage);
+                userFirstName= undefined;
+                userLastName = undefined;
+                userEmail= undefined;
+                start = false
+            }
+        });
+    </script>
+</body>
+</html>
