@@ -1,0 +1,8 @@
+runtime: python39  # Replace with your desired runtime (python27, python37, etc.)
+entrypoint: gunicorn -b :$PORT main:app
+
+handlers:
+- url: /.*
+  script: auto
+
+
